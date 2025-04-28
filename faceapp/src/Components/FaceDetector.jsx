@@ -1,11 +1,21 @@
 import React, {useEffect, useRef, useState} from "react"
 import * as faceapi from 'face-api.js'
-import {Box, Typography} from '@mui/material'
+import {Box, Grid} from '@mui/material'
 
 const FaceDetector = () => {
     const videoRef = useRef(null);
     const canvaRef = useRef(null);
-    const [loading, setLoading] = useState(true);
+    const [countFaces, setCountFaces] = useState(0);
+    const [faceDetect, setFaceDetect] = useState(true);
+    //const [emotionDetect, setEmotionDetect] = useState(true);
+
+    const handleClick = () => {
+        setFaceDetect((prev) => !prev);
+    };
+
+    // const handleToggle = () => {
+    //     setEmotionDetect((prev) => !prev);
+    // };
 
     const startVideo = () => {
         navigator.mediaDevices.getUserMedia({video:{}}).then(stream=>{
@@ -40,39 +50,69 @@ const FaceDetector = () => {
                 })
 
                 canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
-                faceapi.draw.drawDetections(canvas,resized);
-                faceapi.draw.drawFaceExpressions(canvas,resized);
+                if (faceDetect) {
+                    faceapi.draw.drawDetections(canvas,resized);
+
+                    faceapi.draw.drawFaceExpressions(canvas,resized);
+                }
+                faceDetect ? setCountFaces(detections.length) : setCountFaces(0); 
             }
         },500)
 
         //unmount
         return () => clearInterval(interval);
-    }, [])
+    }, [faceDetect/*, emotionDetect*/])
 
     return(
-        <Box position={'relative'} display={'flex'} justifyContent={'center'} mt={4}>
-            <>
-                <video 
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    width={'720'}
-                    height={'560'}
-                    style={{border:10}}
-                />
-                <canvas 
-                    ref={canvaRef}
-                    width={'720'}
-                    height={'560'}
+        <>
+            <Box position={'relative'} display={'flex'} justifyContent={'center'} mt={4}>
+                <>
+                    <video 
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        width={'720'}
+                        height={'560'}
+                        style={{border:10}}
+                    />
+                    <canvas 
+                        ref={canvaRef}
+                        width={'720'}
+                        height={'560'}
+                        style={{
+                            position:'absolute',
+                            top:0,
+                            left:0,
+                            borderRadius:10
+                        }}
+                    />
+                </>
+            </Box>
+            <Grid container spacing={2}>
+                <Grid size={{ xs: 6, md: 4 }}>
+                <button
+                    onClick={handleClick}
                     style={{
-                        position:'absolute',
-                        top:0,
-                        left:0,
-                        borderRadius:10
+                        backgroundColor: faceDetect ? "green" : "red",
+                        color: "white",
+                        padding: "10px 20px",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                        fontSize: "16px"
                     }}
-                />
-            </>
-        </Box>
+                >
+                    {faceDetect ? "Face Detection On" : "Face Detection Off"}
+                </button>
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                    Expression Toggle
+                </Grid>
+                <Grid size={{ xs: 6, md: 4 }}>
+                    Number of Faces Detected : {countFaces}
+                </Grid>
+            </Grid>
+        </>
     )
 }
 export default FaceDetector
