@@ -1,21 +1,21 @@
 import React, {useEffect, useRef, useState} from "react"
 import * as faceapi from 'face-api.js'
-import {Box, Grid} from '@mui/material'
+import {Box, Grid, Switch} from '@mui/material'
 
 const FaceDetector = () => {
     const videoRef = useRef(null);
     const canvaRef = useRef(null);
     const [countFaces, setCountFaces] = useState(0);
     const [faceDetect, setFaceDetect] = useState(true);
-    //const [emotionDetect, setEmotionDetect] = useState(true);
+    const [emotionDetect, setEmotionDetect] = useState(true);
 
     const handleClick = () => {
         setFaceDetect((prev) => !prev);
     };
 
-    // const handleToggle = () => {
-    //     setEmotionDetect((prev) => !prev);
-    // };
+    const handleToggle = () => {
+        setEmotionDetect((prev) => !prev);
+    };
 
     const startVideo = () => {
         navigator.mediaDevices.getUserMedia({video:{}}).then(stream=>{
@@ -52,8 +52,9 @@ const FaceDetector = () => {
                 canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
                 if (faceDetect) {
                     faceapi.draw.drawDetections(canvas,resized);
-
-                    faceapi.draw.drawFaceExpressions(canvas,resized);
+                    if (emotionDetect) {
+                        faceapi.draw.drawFaceExpressions(canvas,resized);
+                    }
                 }
                 faceDetect ? setCountFaces(detections.length) : setCountFaces(0); 
             }
@@ -61,7 +62,7 @@ const FaceDetector = () => {
 
         //unmount
         return () => clearInterval(interval);
-    }, [faceDetect/*, emotionDetect*/])
+    }, [faceDetect, emotionDetect])
 
     return(
         <>
@@ -106,7 +107,8 @@ const FaceDetector = () => {
                 </button>
                 </Grid>
                 <Grid size={{ xs: 6, md: 4 }}>
-                    Expression Toggle
+                    <Switch onChange={handleToggle} defaultChecked />
+                    {emotionDetect ? "Expressions On" : "Expressions Off"}
                 </Grid>
                 <Grid size={{ xs: 6, md: 4 }}>
                     Number of Faces Detected : {countFaces}
