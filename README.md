@@ -16,11 +16,17 @@ Final Assessment for React Training. Faceapp performs real-time face detection a
 
 ## FaceDetector.jsx Component Breakdown
 
+### References
 - **`videoRef`**: Reference to the HTML `<video>` element capturing the webcam feed.
 - **`canvaRef`**: Reference to the `<canvas>` element used for drawing detections.
+### States
 - **`countFaces`**: State variable to keep track of the number of faces detected.
 - **`faceDetect`**: Boolean state to toggle face detection on or off.
 - **`emotionDetect`**: Boolean state to toggle emotion recognition on or off.
+### Functions
+- **`getUserMedia`**: Navigator Function to access the webcam and get livestream
+- **`detectAllFaces`**: Face-api.js Function to detect more than one faces
+- **`withFaceExpressions`**: Face-api.js Function to detect face expression
 - **`handleClick`**: Function to toggle face detection.
 - **`handleToggle`**: Function to toggle emotion recognition.
 
